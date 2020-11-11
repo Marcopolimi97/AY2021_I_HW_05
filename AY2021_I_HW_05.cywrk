@@ -3,7 +3,7 @@
 <!--This file is machine generated and read. It is not intended to be edited by hand.-->
 <!--Due to this, there is no schema for this file.-->
 <CyGuid_2867d519-54d2-4c01-9830-c51cb08bc3dd type_name="CyDesigner.Common.ProjMgmt.Model.CyPrjMgmtWorkspaceSerialize" version="5" xml_contents_version="3" name="AY2021_I_HW_05" persistent="AY2021_I_HW_05.cywrk" platform="NOT_USED">
-<current_project name=".\ANCONA_ELENA.cydsn\ANCONA_ELENA.cyprj" />
+<current_project name=".\MAESTRONI_MARCO.cydsn\MAESTRONI_MARCO.cyprj" />
 <wrkspc_folders />
 <files />
 <projects>
@@ -49,7 +49,7 @@
 <wrkspc_dependency project="FASSINA_GABRIELE.cydsn\FASSINA_GABRIELE.cyprj" dependency="..\..\..\Documents\PSoC Creator\AnnotationLibrary\AnnotationLibrary_lib\AnnotationLibrary_lib.cylib\AnnotationLibrary_lib.cyprj" />
 <wrkspc_dependency project="GALUZZI_GIACOMO.cydsn\GALUZZI_GIACOMO.cyprj" dependency="..\..\..\Documents\PSoC Creator\AnnotationLibrary\AnnotationLibrary_lib\AnnotationLibrary_lib.cylib\AnnotationLibrary_lib.cyprj" />
 <wrkspc_dependency project="GAROFALO_DANIELA.cydsn\GAROFALO_DANIELA.cyprj" dependency="..\..\..\Documents\PSoC Creator\AnnotationLibrary\AnnotationLibrary_lib\AnnotationLibrary_lib.cylib\AnnotationLibrary_lib.cyprj" />
-<wrkspc_dependency project="MAESTRONI_MARCO.cydsn\MAESTRONI_MARCO.cyprj" dependency="..\..\..\Documents\PSoC Creator\AnnotationLibrary\AnnotationLibrary_lib\AnnotationLibrary_lib.cylib\AnnotationLibrary_lib.cyprj" />
+<wrkspc_dependency project="MAESTRONI_MARCO.cydsn\MAESTRONI_MARCO.cyprj" dependency="..\UNI\5^ANNO\I SEM\LABORATORIO DI BIOSENSORI\SOFTWARE\PSoC\PSoC\PSoC_AnnotationLibrary\AnnotationLibrary\AnnotationLibrary_lib\AnnotationLibrary_lib.cylib\AnnotationLibrary_lib.cyprj" />
 <wrkspc_dependency project="PAPPOLLA_MARGHERITA.cydsn\PAPPOLLA_MARGHERITA.cyprj" dependency="..\..\..\Documents\PSoC Creator\AnnotationLibrary\AnnotationLibrary_lib\AnnotationLibrary_lib.cylib\AnnotationLibrary_lib.cyprj" />
 <wrkspc_dependency project="PEDICA_BENEDETTA.cydsn\PEDICA_BENEDETTA.cyprj" dependency="..\..\..\Documents\PSoC Creator\AnnotationLibrary\AnnotationLibrary_lib\AnnotationLibrary_lib.cylib\AnnotationLibrary_lib.cyprj" />
 <wrkspc_dependency project="PIRELLI_ALESSANDRO.cydsn\PIRELLI_ALESSANDRO.cyprj" dependency="..\..\..\Documents\PSoC Creator\AnnotationLibrary\AnnotationLibrary_lib\AnnotationLibrary_lib.cylib\AnnotationLibrary_lib.cyprj" />
