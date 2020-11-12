@@ -1,5 +1,6 @@
 /**
 * 
+*
 */
 
 // Include required header files
@@ -7,10 +8,6 @@
 #include "I2C_Interface.h"
 #include "project.h"
 #include "stdio.h"
-
-
-
-
 
 
 /**
@@ -29,6 +26,9 @@
 */
 #define LIS3DH_STATUS_REG 0x27
 
+//new data available in status register (bit 5)
+#define LIS3DH_STATUS_REG_NEW_DATA  0x08
+
 /**
 *   \brief Address of the Control register 1
 */
@@ -43,7 +43,7 @@
 *   \ Address of HIGH RESOLUTION MODE in control registers
 */
 #define LIS3DH_HIGH_RESOLUTION_MODE_CTRL_REG1 0x07
-#define LIS3DH_HIGH_RESOLUTION_MODE_CTRL_REG4 0x28 
+#define LIS3DH_HIGH_RESOLUTION_MODE_CTRL_REG4 0x08 
 
 //address of different frequencies in control register 1
 
@@ -130,7 +130,7 @@ int main(void)
     
     //------------------------------------------------------------------------------------
     //CTRL_REG4
-    //FS=+-8g so I have a sensitivity of 4 (seen in datasheet "mechanical characteristhics")
+    //FS=+-2g (seen in datasheet "mechanical characteristhics")
     uint8_t ctrl_reg4;
     
     ctrl_reg4=LIS3DH_HIGH_RESOLUTION_MODE_CTRL_REG4;
@@ -151,29 +151,30 @@ int main(void)
     //------------------------------------------------------------------------------
     
     
-    CyDelay(5); //"The boot procedure is complete about 5 milliseconds after device power-up."
+    //CyDelay(5); //"The boot procedure is complete about 5 milliseconds after device power-up."
       
     
     uint8_t header = 0xA0;
     uint8_t footer = 0xC0;
+    uint8_t OutArrayOld [8];
     uint8_t OutArray [8];
     OutArray[0] = header;
     OutArray[7] = footer;
-    int16 conversion = 1;
+    //since the sensitivity is set to 
+    float conversion = 1; 
     int16 dirtytrick = 1000;
     
     float XDataOutConv;
     float YDataOutConv;
     float ZDataOutConv;
-    
-    
+      
     uint8_t XData[2];
     uint8_t YData[2];
     uint8_t ZData[2];
     
-    int16 XDataOut;
-    int16 YDataOut;
-    int16 ZDataOut;
+    int16 XDataOut=0;
+    int16 YDataOut=0;
+    int16 ZDataOut=0;
     
     //at startup I read the address of the EEPROM where it's stored the address of the control register 1 setting the frequency.
     //I do not set any frequency here because anyway I'll enter in a if condition later that sets the frequency.
@@ -394,17 +395,24 @@ int main(void)
                                                                      2,
                                                                 YData);
         
-        /*---CHECK ---
+        
         if (error == NO_ERROR)
         {
+            /*---CHECK ---
             sprintf(message, "YData is: %s\r\n", YData);
             UART_Debug_PutString(message); 
+            ---------*/
+            //YDataOut is 12 bit long
+            YDataOut = (int16)((YData[0] | (YData[1]<<8)))>>4;
+            YDataOutConv = YDataOut * conversion;
+        
+            YDataOut = (int16) (YDataOutConv * dirtytrick);
         }
         else
         {
             //UART_Debug_PutString("Error");   
         }  
-        ---------*/
+        
         
         //ZData read
         error = I2C_Peripheral_ReadRegisterMulti(LIS3DH_DEVICE_ADDRESS,
@@ -412,30 +420,70 @@ int main(void)
                                                                      2,
                                                                 ZData);
         
-        /*---CHECK ---
+        
         if (error == NO_ERROR)
         {
+            /*---CHECK ---
             sprintf(message, "ZData is: %s\r\n", ZData);
+            UART_Debug_PutString(message);
+            ---------*/
+            //ZDataOut is 12 bit long
+            ZDataOut = (int16)((ZData[0] | (ZData[1]<<8)))>>4;
+            ZDataOutConv = ZDataOut * conversion;
+        
+            ZDataOut = (int16) (ZDataOutConv * dirtytrick);
+       
+        }
+        else
+        {
+            //UART_Debug_PutString("Error");   
+        }  
+        
+        //read of the status register to see if a set of new data is available
+        //STATUS_REG
+        uint8_t status_reg;  
+    
+        error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
+                                                LIS3DH_STATUS_REG,
+                                                     &status_reg);
+    
+        /*--CHECK --
+        if (error == NO_ERROR)
+        {
+            sprintf(message, "STATUS REGISTER 0x%02X\r\n", status_reg);
             UART_Debug_PutString(message); 
         }
         else
         {
-            UART_Debug_PutString("Error");   
-        }  
-        ---------*/
+            UART_Debug_PutString("Error\r\n");   
+        }
+        ----*/
         
-        
-        
-          
-        OutTemp = (int16)((TemperatureData[0] | (TemperatureData[1]<<8)))>>6;
-        outtempconv = OutTemp * conversion;
-        
-        OutTemp = (int16) (outtempconv * dirtytrick);
-        
-        OutArray[1] = (uint8_t)(OutTemp & 0xFF);
-        OutArray[2] = (uint8_t)(OutTemp >> 8);
-        UART_Debug_PutArray(OutArray, 4);
-          
+        //------------------
+        //if(status_reg & LIS3DH_STATUS_REG_NEW_DATA)
+        //{
+            //put together the array of X,Y and Z data to send to BCP
+            OutArray[1] = (uint8_t)(XDataOut & 0xFF);
+            OutArray[2] = (uint8_t)(XDataOut >> 8);
+            
+            OutArray[3] = (uint8_t)(YDataOut & 0xFF);
+            OutArray[4] = (uint8_t)(YDataOut >> 8);
+            
+            OutArray[5] = (uint8_t)(ZDataOut & 0xFF);
+            OutArray[6] = (uint8_t)(ZDataOut >> 8);
+            
+            for(int i=0;i<8;i++)
+            {
+                OutArrayOld[i]=OutArray[i];             
+            }
+            
+            UART_Debug_PutArray(OutArray, 8);  
+        //}
+        //else
+        //{
+            //UART_Debug_PutString("no new data available\r\n"); 
+        //    UART_Debug_PutArray(OutArrayOld, 8);  
+        //}
     }
 }
 
