@@ -1,12 +1,10 @@
 /* ========================================
  *
- * Copyright YOUR COMPANY, THE YEAR
- * All Rights Reserved
- * UNPUBLISHED, LICENSED SOFTWARE.
+ * MARCO MAESTRONI
  *
- * CONFIDENTIAL AND PROPRIETARY INFORMATION
- * WHICH IS THE PROPERTY OF your company.
- *
+ * Here, I check when the switch is pressed and I set the different states
+ * representing different frequencies defined in main code
+ * 
  * ========================================
 */
 #include "InterruptRoutines.h"

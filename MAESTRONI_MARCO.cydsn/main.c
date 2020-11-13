@@ -1,6 +1,12 @@
 /**
-* 
+*  MARCO MAESTRONI
 *
+*  In the main code I do the following steps: 
+*
+* - Set the registers to read the accelerometer on both the 3 axis
+* - I read the address of the EEPROM where it's stored the address of the control register 1,setting the frequency
+* - I read the value of the outputs on the 3 axis and I prepare the data to be sent through UART                                      
+* 
 */
 
 // Include required header files
@@ -60,8 +66,6 @@
 */
 #define LIS3DH_CTRL_REG4 0x23
 
-#define LIS3DH_CTRL_REG4_BDU_ACTIVE 0x80 //1000 0000, BDU active only
-
 /**
 *   \brief Address of the X,Y and Z output LSB register
 */
@@ -70,13 +74,9 @@
 #define LIS3DH_OUT_Z_L 0x2C
 
 
-// EEPROM startup register.
-//I manually changed the EEPROM value to a startup value to be written on control register 1 to set frequency (1Hz)
+// EEPROM startup register
 
 #define EEPROM_STARTUP_ADDRESS   0x00
-
-
-//default frequency register set
 
 //define states
 #define FREQ_1_HZ          1
@@ -86,7 +86,7 @@
 #define FREQ_100_HZ        5
 #define FREQ_200_HZ        6
 
-//init variable
+//init variables
 int state=1;
 int newstate=1;
 
@@ -98,8 +98,7 @@ int main(void)
     I2C_Peripheral_Start();
     UART_Debug_Start();
     EEPROM_Start();
-    
-        
+           
     // String to print out messages on the UART
     char message[50] = {'\0'};
     
@@ -156,13 +155,17 @@ int main(void)
     
     uint8_t header = 0xA0;
     uint8_t footer = 0xC0;
-    uint8_t OutArrayOld [8];
     uint8_t OutArray [8];
     OutArray[0] = header;
     OutArray[7] = footer;
-    //since the sensitivity is set to 
-    float conversion = 1; 
-    int16 dirtytrick = 1000;
+    //since the sensitivity is set to 1 mg/digit
+    //because FS=+-2g (seen in datasheet "mechanical characteristhics"), we have:
+    //
+    //    1 digit= 1 mg= 9.8 * 10^-3 m/s^2  
+    //
+    //we set the conversion factor in the following way:
+    float conversion = 0.00981; //9.8 * 10^-3
+    int dirtytrick = 1000; // in order to send int values to rescale in BCP
     
     float XDataOutConv;
     float YDataOutConv;
@@ -447,7 +450,7 @@ int main(void)
                                                 LIS3DH_STATUS_REG,
                                                      &status_reg);
     
-        /*--CHECK --
+        /*--CHECK---
         if (error == NO_ERROR)
         {
             sprintf(message, "STATUS REGISTER 0x%02X\r\n", status_reg);
@@ -472,17 +475,13 @@ int main(void)
             OutArray[5] = (uint8_t)(ZDataOut & 0xFF);
             OutArray[6] = (uint8_t)(ZDataOut >> 8);
             
-            for(int i=0;i<8;i++)
-            {
-                OutArrayOld[i]=OutArray[i];             
-            }
-            
+       
             UART_Debug_PutArray(OutArray, 8);  
         //}
         //else
         //{
             //UART_Debug_PutString("no new data available\r\n"); 
-        //    UART_Debug_PutArray(OutArrayOld, 8);  
+            //UART_Debug_PutArray(OutArrayOld, 8);  
         //}
     }
 }

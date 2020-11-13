@@ -1,5 +1,7 @@
 /*
-* 
+* MARCO MAESTRONI
+*
+* I2C functions definitions
 */
 
 /**
